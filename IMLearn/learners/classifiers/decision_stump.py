@@ -42,11 +42,11 @@ class DecisionStump(BaseEstimator):
         """
         # find the best split
         loss_star  = np.inf
-        for sign, j in product([-1, 1], range(X.shape[1])):
-            threshold, loss = self._find_threshold(X[:, j], y, sign)
-            if loss < loss_star:
+        for sign, i in product([-1, 1], range(X.shape[1])):
+            threshold, loss = self._find_threshold(X[:, i], y, sign)
+            if loss <= loss_star:
                 loss_star = loss
-                self.threshold_, self.j_, self.sign_ = threshold, j, sign
+                self.threshold_, self.j_, self.sign_ = threshold, i, sign
 
 
 

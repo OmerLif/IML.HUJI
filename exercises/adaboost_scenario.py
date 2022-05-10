@@ -40,8 +40,8 @@ def generate_data(n: int, noise_ratio: float) -> Tuple[np.ndarray, np.ndarray]:
 def Q_1(train_X, train_y, test_X, test_y, n_learners=250, noise=0):
     ada = AdaBoost(DecisionStump, n_learners)
     ada.fit(train_X, train_y)
-    train_misclassification_error = []
     test_misclassification_error = []
+    train_misclassification_error = []
     for i in range(1, n_learners + 1):
         test_misclassification_error.append(ada.partial_loss(test_X, test_y, i))
         train_misclassification_error.append(ada.partial_loss(train_X, train_y, i))
@@ -76,7 +76,7 @@ def Q_2_decision_boundaries(ada, test_X, test_y, T, lims):
         fig.add_traces([decision_surface(partial_predict, lims[0], lims[1], showscale=False),
                         go.Scatter(x=test_X[:, 0], y=test_X[:, 1], mode="markers", showlegend=False,
                                    marker=dict(color=test_y, colorscale=[custom[0], custom[-1]],
-                                               line=dict(width=1)))], rows=(i // 2) + 1, cols=(i % 2) + 1)
+                                               line=dict(width=2)))], rows=(i // 2) + 1, cols=(i % 2) + 1)
     fig.update_layout(title='AdaBoost Decision Boundaries',
                       xaxis_title='x',
                       yaxis_title='y')
@@ -114,6 +114,8 @@ def Q_4_decision_boundaries_weighted(ada,train_X, train_y,lims, noise=0):
         fig.update_layout(title=f'Decision Boundaries with Weighted Samples with noise of level: {noise}')
     fig.show()
 
+
+
 def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=500):
     (train_X, train_y), (test_X, test_y) = generate_data(train_size, noise), generate_data(test_size, noise)
 
@@ -123,12 +125,12 @@ def fit_and_evaluate_adaboost(noise, n_learners=250, train_size=5000, test_size=
     T = [5, 50, 100, 250]
     lims = np.array([np.r_[train_X, test_X].min(axis=0), np.r_[train_X, test_X].max(axis=0)]).T + np.array([-.1, .1])
 
-    # Question 2: Plotting decision surfaces of AdaBoost
 
     if noise == 0:
-        Q_2_decision_boundaries(ada, test_X, test_y, T,lims)
+        # Question 2: Plotting decision surfaces of AdaBoost
+        Q_2_decision_boundaries(ada, test_X, test_y, T, lims)
 
-    # Question 3: Decision surface of best performing ensemble
+        # Question 3: Decision surface of best performing ensemble
         Q_3_best_ensemble(ada, test_error, test_X, test_y, lims)
 
 
