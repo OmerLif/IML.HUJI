@@ -5,7 +5,6 @@ import numpy as np
 from IMLearn import BaseEstimator
 
 
-
 def cross_validate(estimator: BaseEstimator, X: np.ndarray, y: np.ndarray,
                    scoring: Callable[[np.ndarray, np.ndarray, ...], float], cv: int = 5) -> Tuple[float, float]:
     """
@@ -59,6 +58,7 @@ def cross_validate(estimator: BaseEstimator, X: np.ndarray, y: np.ndarray,
         train_predictions = estimator_copy.predict(train_x)
 
         validation_score = scoring(validation_y, validation_predictions)
+
         train_score = scoring(train_y, train_predictions)
         # save the scores
         train_scores.append(train_score)
