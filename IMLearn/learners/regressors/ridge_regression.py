@@ -64,6 +64,7 @@ class RidgeRegression(BaseEstimator):
         self.coefs_ = np.linalg.inv(X.T @ X + self.lam_ * np.eye(X.shape[1])) @ X.T @ y
 
 
+
     def _predict(self, X: np.ndarray) -> np.ndarray:
         """
         Predict responses for given samples using fitted estimator

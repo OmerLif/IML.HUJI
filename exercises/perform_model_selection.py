@@ -33,9 +33,9 @@ def select_polynomial_degree(n_samples: int = 100, noise: float = 5):
     clean_y = model(x)
     noise_data = np.random.normal(loc=0, scale=noise, size=len(clean_y))
     dirty_y = clean_y + noise_data
+    x.flatten()
     # split into training and testing portions (2/3 for training, 1/3 for testing)
-    test_x_clean, test_y_clean, train_x_clean, train_y_clean = Q_1_plot_data(clean_y, x, noise)
-    test_x_dirty, test_y_dirty, train_x_dirty, train_y_dirty = Q_1_plot_data(dirty_y, x, noise)
+    test_x_clean, test_y_clean, train_x_clean, train_y_clean = Q_1_plot_data(clean_y, dirty_y, x, noise)
     # Question 2 - Perform CV for polynomial fitting with degrees 0,1,...,10
     train_errors_clean = validate_errors_clean = []
     if noise == 0:
@@ -53,7 +53,9 @@ def select_polynomial_degree(n_samples: int = 100, noise: float = 5):
 
 def Practical_part_1():
     select_polynomial_degree()
+    print()
     select_polynomial_degree(100, 0)
+    print()
     select_polynomial_degree(1500, 10)
 
 
@@ -62,24 +64,19 @@ def test_results_over_best_fit(test_x_clean, test_x_dirty, test_y_clean, test_y_
                                validate_errors_clean, validate_errors_dirty, noise=5):
     print(train_errors_dirty)
     print(validate_errors_dirty)
-    print(train_errors_clean)
-    print(validate_errors_clean)
     best_degree_dirty = np.argmin(validate_errors_dirty)
     best_degree_clean = 0
-    if validate_errors_clean:
+    if validate_errors_clean or noise == 0:
         best_degree_clean = np.argmin(validate_errors_clean)
-    print(f"Best degree for dirty data is {best_degree_dirty}", f"Best degree for clean data is {best_degree_clean}")
+    print(f"Best degree for dirty noise: {noise} data is {best_degree_dirty}, {best_degree_clean} for clean data")
     # fit a polynoimal model with the best degree and plot the mean square error results
     poly_dirty = PolynomialFitting(best_degree_dirty)
-    poly_clean = PolynomialFitting(best_degree_clean)
     poly_dirty.fit(train_x_dirty, train_y_dirty)
-    poly_clean.fit(train_x_clean, train_y_clean)
     # predict the test data
     test_y_pred_dirty = poly_dirty.predict(test_x_dirty)
-    test_y_pred_clean = poly_clean.predict(test_x_clean)
     # present the error results
-    print(f"Mean square error for dirty data is {mean_square_error(test_y_pred_dirty, test_y_dirty)} noise level is {noise}")
-    print(f"Mean square error for clean data is {mean_square_error(test_y_pred_clean, test_y_clean)}")
+    print(f"Mean square error for dirty noise: {noise} data is {mean_square_error(test_y_pred_dirty, test_y_dirty)} noise level is {noise}")
+    print(f"Mean square error for training data: {noise} data is {mean_square_error(poly_dirty.predict(train_x_dirty), train_y_dirty)} noise level is {noise}")
 
 
 def Q_2_poly_over_dirty(dirty_y, x, noise=5):
@@ -127,14 +124,19 @@ def Q_2_poly_over_clean(train_x_clean, train_y_clean):
     return train_errors_clean, validate_errors_clean
 
 
-def Q_1_plot_data(clean_y, x, noise=0):
+def Q_1_plot_data(clean_y, dirty_y ,x, noise=0):
     train_x_clean, train_y_clean, test_x_clean, test_y_clean = split_train_test(x, clean_y, 0.667)
+    train_x_dirty, train_y_dirty, test_x_dirty, test_y_dirty = split_train_test(x, dirty_y, 0.667)
     train_x_clean = train_x_clean.flatten()
     test_x_clean = test_x_clean.flatten()
+    train_x_dirty = train_x_dirty.flatten()
+    test_x_dirty = test_x_dirty.flatten()
+    x.flatten()
     fig = go.Figure()
     fig.add_trace(
-        go.Scatter(x=train_x_clean, y=train_y_clean, mode='markers', name='Training data', marker_color='blue'))
-    fig.add_trace(go.Scatter(x=test_x_clean, y=test_y_clean, mode='markers', name='Test data', marker_color='red'))
+        go.Scatter(x=train_x_dirty, y=train_y_dirty, mode='markers', name='Training data', marker_color='blue'))
+    fig.add_trace(go.Scatter(x=test_x_dirty, y=test_y_dirty, mode='markers', name='Test data', marker_color='red'))
+    fig.add_trace(go.Scatter(x=x, y=clean_y, mode='markers', name='Training data', marker_color='green'))
     fig.update_layout(title=f'Training and test data with noise level of {noise}', xaxis_title='x', yaxis_title='y')
     fig.show()
     return test_x_clean, test_y_clean, train_x_clean, train_y_clean
@@ -223,7 +225,7 @@ def load_data(n_evaluations, n_samples):
     # choose the remaining samples as testing data
     X_test, y_test = X[n_samples:], y[n_samples:]
     # Question 6 - Create a list of regularization parameter values to evaluate
-    l1_ratios = np.linspace(0.005, 1, n_evaluations)
+    l1_ratios = np.linspace(0.001, 1, 500)
     return X_test, X_train, l1_ratios, y_test, y_train
 
 
