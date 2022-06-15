@@ -32,7 +32,8 @@ class FixedLR(BaseLR):
         -----
         No arguments are expected
         """
-        raise NotImplementedError()
+        eta = self.base_lr
+        return eta
 
 
 class ExponentialLR(FixedLR):
@@ -68,4 +69,5 @@ class ExponentialLR(FixedLR):
         eta_t: float
             Exponential decay according to eta_t = eta*gamma^t
         """
-        raise NotImplementedError()
+        eta_t = self.base_lr * (self.decay_rate ** t)
+        return eta_t
